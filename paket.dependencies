@@ -1,7 +1,0 @@
-framework: net461
-
-source https://nuget.org/api/v2
-
-nuget FSharp.Core
-nuget FAKE
-nuget Expecto

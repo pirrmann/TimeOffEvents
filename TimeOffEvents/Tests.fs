@@ -21,8 +21,8 @@ let creationTests =
       let request = {
         UserId = 1
         RequestId = Guid.Empty
-        Start = { Date = DateTime(2017, 12, 30); HalfDay = AM }
-        End = { Date = DateTime(2017, 12, 30); HalfDay = PM } }
+        Start = { Date = DateTime(2018, 12, 28); HalfDay = AM }
+        End = { Date = DateTime(2018, 12, 28); HalfDay = PM } }
 
       Given [ ]
       |> When (RequestTimeOff request)
@@ -36,8 +36,8 @@ let validationTests =
       let request = {
         UserId = 1
         RequestId = Guid.Empty
-        Start = { Date = DateTime(2017, 12, 30); HalfDay = AM }
-        End = { Date = DateTime(2017, 12, 30); HalfDay = PM } }
+        Start = { Date = DateTime(2018, 12, 28); HalfDay = AM }
+        End = { Date = DateTime(2018, 12, 28); HalfDay = PM } }
 
       Given [ RequestCreated request ]
       |> When (ValidateRequest (1, Guid.Empty))

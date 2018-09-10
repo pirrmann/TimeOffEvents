@@ -6,13 +6,29 @@
         {
             "taskName": "Build",
             "type": "shell",
-            "command": "${workspaceRoot}/build.sh",
+            "command": "dotnet build",
             "windows": {
-                "command": "${workspaceRoot}/build.cmd"
+                "command": "dotnet build"
             },
             "problemMatcher":"$msCompile",
             "group": {
                 "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "Run tests",
+            "type": "shell",
+            "command": "dotnet run",
+            "windows": {
+                "command": "dotnet run",
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/TimeOffEvents"
+            },
+            "problemMatcher":"$msCompile",
+            "group": {
+                "kind": "test",
                 "isDefault": true
             }
         }
