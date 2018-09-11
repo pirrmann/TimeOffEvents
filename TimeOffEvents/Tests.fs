@@ -10,7 +10,7 @@ let Then expected message (events: RequestEvent list, command) =
     for event in events do
       let stream = store.GetStream event.Request.UserId
       stream.Append [event]
-    let result = Logic.handleCommand store command
+    let result = Logic.decide store command
     Expect.equal result expected message
 
 open System
@@ -26,7 +26,7 @@ let creationTests =
 
       Given [ ]
       |> When (RequestTimeOff request)
-      |> Then (Ok [RequestCreated request]) "The request has been created"
+      |> Then (Ok [RequestCreated request]) "The request should have been created"
     }
   ]
 
@@ -41,7 +41,7 @@ let validationTests =
 
       Given [ RequestCreated request ]
       |> When (ValidateRequest (1, Guid.Empty))
-      |> Then (Ok [RequestValidated request]) "The request has been validated"
+      |> Then (Ok [RequestValidated request]) "The request should have been validated"
     }
   ]
 

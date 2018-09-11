@@ -3,6 +3,7 @@
 open System
 open EventStorage
 
+// First, we define our domain
 type User =
     | Employee of int
     | Manager
@@ -23,6 +24,7 @@ type TimeOffRequest = {
     End: Boundary
 }
 
+// Then our commands
 type Command =
     | RequestTimeOff of TimeOffRequest
     | ValidateRequest of UserId * Guid with
@@ -31,6 +33,7 @@ type Command =
         | RequestTimeOff request -> request.UserId
         | ValidateRequest (userId, _) -> userId
 
+// And our events
 type RequestEvent =
     | RequestCreated of TimeOffRequest
     | RequestValidated of TimeOffRequest with
@@ -39,6 +42,8 @@ type RequestEvent =
         | RequestCreated request -> request
         | RequestValidated request -> request
 
+// We then define the state of the system,
+// and our 2 main functions `decide` and `evolve`
 module Logic =
 
     type RequestState =
@@ -56,21 +61,24 @@ module Logic =
             | PendingValidation _
             | Validated _ -> true
 
-    let evolve _ event =
+    let evolve state event =
         match event with
         | RequestCreated request -> PendingValidation request
         | RequestValidated request -> Validated request
 
-    let getRequestState events =
-        events |> Seq.fold evolve NotCreated
+    let getRequestState requestEvents =
+        requestEvents |> Seq.fold evolve NotCreated
 
-    let getAllRequests events =
+    // This function builds a map (i.e. a dictionary)
+    // of request states by request id, from all events
+    // associated to a user's requests
+    let getAllRequests userRequestsEvents =
         let folder requests (event: RequestEvent) =
             let state = defaultArg (Map.tryFind event.Request.RequestId requests) NotCreated
             let newState = evolve state event
             requests.Add (event.Request.RequestId, newState)
 
-        events |> Seq.fold folder Map.empty
+        userRequestsEvents |> Seq.fold folder Map.empty
 
     let overlapWithAnyRequest (otherRequests: TimeOffRequest seq) request =
         false //TODO
@@ -78,6 +86,7 @@ module Logic =
     let createRequest activeUserRequests  request =
         if overlapWithAnyRequest activeUserRequests  request then
             Error "Overlapping request"
+        // This DateTime.Today must go away!
         elif request.Start.Date <= DateTime.Today then
             Error "The request starts in the past"
         else
@@ -90,7 +99,7 @@ module Logic =
         | _ ->
             Error "Request cannot be validated"
 
-    let handleCommand (store: IStore<UserId, RequestEvent>) (command: Command) =
+    let decide (store: IStore<UserId, RequestEvent>) (command: Command) =
         let userId = command.UserId
         let stream = store.GetStream userId
         let events = stream.ReadAll()
