@@ -80,11 +80,14 @@ module Logic =
 
         userRequestsEvents |> Seq.fold folder Map.empty
 
-    let overlapWithAnyRequest (otherRequests: TimeOffRequest seq) request =
-        false //TODO
+    let overlapsWith request1 request2 =
+        false //TODO: write a function that checks if 2 requests overlap
+
+    let overlapsWithAnyRequest (otherRequests: TimeOffRequest seq) request =
+        false //TODO: write this function using overlapsWith
 
     let createRequest activeUserRequests  request =
-        if overlapWithAnyRequest activeUserRequests  request then
+        if request |> overlapsWithAnyRequest activeUserRequests then
             Error "Overlapping request"
         // This DateTime.Today must go away!
         elif request.Start.Date <= DateTime.Today then
