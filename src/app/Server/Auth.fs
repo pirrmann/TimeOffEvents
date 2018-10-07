@@ -1,27 +1,28 @@
 /// Login web part and functions for API web part request authorisation with JWT.
 module ServerCode.Auth
 
+open TimeOff
+
 open System
 open Giraffe
 open RequestErrors
 open Microsoft.AspNetCore.Http
-open ServerCode.Domain
 open FSharp.Control.Tasks.V2
 
-let createUserData (login : Domain.Login) =
+let createUserData (login : AuthTypes.Login) =
     {
         UserName = login.UserName
         Token    =
             ServerCode.JsonWebToken.encode (
                 { UserName = login.UserName } : ServerTypes.UserRights
             )
-    } : Domain.UserData
+    } : AuthTypes.UserData
 
 /// Authenticates a user and returns a token in the HTTP body.
 let login : HttpHandler =
     fun (next : HttpFunc) (ctx : HttpContext) ->
         task {
-            let! login = ctx.BindJsonAsync<Domain.Login>()
+            let! login = ctx.BindJsonAsync<AuthTypes.Login>()
             return!
                 match login.IsValid() with
                 | true  ->
