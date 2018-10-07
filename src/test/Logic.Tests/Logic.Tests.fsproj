@@ -4,8 +4,8 @@
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\app\TimeOffEvents\TimeOffEvents.fsproj">
-      <Name>TimeOffEvents.fsproj</Name>
+    <ProjectReference Include="..\..\app\Logic\Logic.fsproj">
+      <Name>Logic.fsproj</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

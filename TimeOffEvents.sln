@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TimeOffEvents", "src\app\TimeOffEvents\TimeOffEvents.fsproj", "{E43259BB-76F6-4435-B345-DACDEBF323BF}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Logic", "src\app\Logic\Logic.fsproj", "{E43259BB-76F6-4435-B345-DACDEBF323BF}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "TimeOffEventsTests", "src\test\TimeOffEventsTests\TimeOffEventsTests.fsproj", "{FD40B736-32E5-4835-BB96-EF493D7F9D62}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Logic.Tests", "src\test\Logic.Tests\Logic.Tests.fsproj", "{FD40B736-32E5-4835-BB96-EF493D7F9D62}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
