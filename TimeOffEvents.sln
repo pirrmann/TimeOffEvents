@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Logic", "src\app\Logic\Logic.fsproj", "{E43259BB-76F6-4435-B345-DACDEBF323BF}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Api", "src\app\Api\Api.fsproj", "{FEF3C9AD-A3B8-4594-BB94-1A4D27A0ACC1}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Server", "src\app\Server\Server.fsproj", "{FEF3C9AD-A3B8-4594-BB94-1A4D27A0ACC1}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Logic.Tests", "src\test\Logic.Tests\Logic.Tests.fsproj", "{FD40B736-32E5-4835-BB96-EF493D7F9D62}"
 EndProject

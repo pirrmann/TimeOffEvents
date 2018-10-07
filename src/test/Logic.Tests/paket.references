@@ -1,2 +1,2 @@
-nuget Expecto
-nuget FSharp.Core
+Expecto
+FSharp.Core

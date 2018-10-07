@@ -1,7 +1,8 @@
-module Sandbox.App
+module Server.App
 
 open System
 open System.IO
+open Microsoft.AspNetCore.Authentication.JwtBearer
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Cors.Infrastructure
 open Microsoft.AspNetCore.Hosting
@@ -40,10 +41,13 @@ module HttpHandlers =
 // Web app
 // ---------------------------------
 
+let authorize =
+    requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
+
 let webApp =
     choose [
         subRoute "/api"
-            (choose [
+            (authorize >=> choose [
                 GET >=> choose [
                     route "/hello" >=> HttpHandlers.handleGetHello
                 ]
