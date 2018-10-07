@@ -1,4 +1,4 @@
-module Server.JsonWebToken
+module ServerCode.JsonWebToken
 
 //  Learn about JWT https://jwt.io/introduction/
 //  This module uses the JOSE-JWT library https://github.com/dvsekhvalnov/jose-jwt
