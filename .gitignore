@@ -248,6 +248,9 @@ paket-files/
 # FAKE - F# Make
 .fake/
 
+# JWT temp token
+.jwt/
+
 # JetBrains Rider
 .idea/
 *.sln.iml

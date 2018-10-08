@@ -13,7 +13,7 @@ let private createPassPhrase() =
     randomNumber
 
 let private passPhrase =
-    let fi = FileInfo("./temp/token.txt")
+    let fi = FileInfo("./.jwt/token.txt")
     if not fi.Exists then
         let passPhrase = createPassPhrase()
         if not fi.Directory.Exists then

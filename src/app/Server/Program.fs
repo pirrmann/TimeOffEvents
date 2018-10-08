@@ -2,13 +2,14 @@ module Server.App
 
 open System
 open System.IO
-open Microsoft.AspNetCore.Authentication.JwtBearer
 open Microsoft.AspNetCore.Builder
 open Microsoft.AspNetCore.Cors.Infrastructure
 open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
 open Giraffe
+
+open ServerCode
 
 // ---------------------------------
 // Models
@@ -28,11 +29,11 @@ module HttpHandlers =
 
     open Microsoft.AspNetCore.Http
 
-    let handleGetHello =
+    let handleGetHello (userRights: ServerTypes.UserRights) =
         fun (next : HttpFunc) (ctx : HttpContext) ->
             task {
                 let response = {
-                    Text = "Hello world, from Giraffe!"
+                    Text = sprintf "Hello %s, from Giraffe!" userRights.UserName
                 }
                 return! json response next ctx
             }
@@ -41,15 +42,15 @@ module HttpHandlers =
 // Web app
 // ---------------------------------
 
-let authorize =
-    requiresAuthentication (challenge JwtBearerDefaults.AuthenticationScheme)
-
 let webApp =
     choose [
         subRoute "/api"
-            (authorize >=> choose [
+            (choose [
                 GET >=> choose [
-                    route "/hello" >=> HttpHandlers.handleGetHello
+                    route "/test" >=> Auth.requiresJwtTokenForAPI HttpHandlers.handleGetHello
+                ]
+                POST >=> choose [
+                    route "/users/login" >=> Auth.login
                 ]
             ])
         setStatusCode 404 >=> text "Not Found" ]
