@@ -1,4 +1,7 @@
-module Server.App
+module ServerCode.App
+
+open TimeOff
+open EventStorage
 
 open System
 open System.IO
@@ -8,18 +11,7 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
 open Giraffe
-
-open ServerCode
-
-// ---------------------------------
-// Models
-// ---------------------------------
-
-[<CLIMutable>]
-type Message =
-    {
-        Text : string
-    }
+open FSharp.Control.Tasks
 
 // ---------------------------------
 // Handlers
@@ -29,12 +21,11 @@ module HttpHandlers =
 
     open Microsoft.AspNetCore.Http
 
-    let handleGetHello (userRights: ServerTypes.UserRights) =
+    let requestTimeOff (userRights: ServerTypes.UserRights) =
         fun (next : HttpFunc) (ctx : HttpContext) ->
             task {
-                let response = {
-                    Text = sprintf "Hello %s, from Giraffe!" userRights.UserName
-                }
+                let! request = ctx.BindJsonAsync<TimeOffRequest>()
+                let response = { request with UserId = 2 }
                 return! json response next ctx
             }
 
@@ -42,15 +33,13 @@ module HttpHandlers =
 // Web app
 // ---------------------------------
 
-let webApp =
+let webApp (eventStore: IStore<UserId, RequestEvent>) =
     choose [
         subRoute "/api"
             (choose [
-                GET >=> choose [
-                    route "/test" >=> Auth.requiresJwtTokenForAPI HttpHandlers.handleGetHello
-                ]
                 POST >=> choose [
                     route "/users/login" >=> Auth.login
+                    route "/timeoff/request" >=> Auth.requiresJwtTokenForAPI HttpHandlers.requestTimeOff
                 ]
             ])
         setStatusCode 404 >=> text "Not Found" ]
@@ -74,6 +63,8 @@ let configureCors (builder : CorsPolicyBuilder) =
            |> ignore
 
 let configureApp (app : IApplicationBuilder) =
+    let eventStore = InMemoryStore.Create<UserId, RequestEvent>()
+    let webApp = webApp eventStore
     let env = app.ApplicationServices.GetService<IHostingEnvironment>()
     (match env.IsDevelopment() with
     | true  -> app.UseDeveloperExceptionPage()

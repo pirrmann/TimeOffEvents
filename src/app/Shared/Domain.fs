@@ -9,6 +9,7 @@ type User =
 
 type HalfDay = | AM | PM
 
+[<CLIMutable>]
 type Boundary = {
     Date: DateTime
     HalfDay: HalfDay
@@ -16,6 +17,7 @@ type Boundary = {
 
 type UserId = int
 
+[<CLIMutable>]
 type TimeOffRequest = {
     UserId: UserId
     RequestId: Guid

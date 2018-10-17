@@ -1,4 +1,5 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
@@ -6,9 +7,11 @@
     <ProjectReference Include="..\Shared\Shared.fsproj">
       <Name>Shared.fsproj</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Storage\Storage.fsproj">
+      <Name>Storage.fsproj</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EventStorage.fs" />
     <Compile Include="Model.fs" />
   </ItemGroup>
   <Import Project="..\..\..\.paket\Paket.Restore.targets" />

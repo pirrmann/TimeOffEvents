@@ -1,12 +1,5 @@
 namespace EventStorage
 
-type IStream<'TValue> =
-  abstract member ReadAll: unit -> 'TValue seq
-  abstract member Append: values:'TValue list -> unit
-
-type IStore<'TKey, 'TValue when 'TKey: comparison> =
-  abstract member GetStream: 'TKey -> IStream<'TValue>
-
 type private InMemoryStream<'TValue> () =
   let stream = ResizeArray<'TValue>()
 
