@@ -251,6 +251,9 @@ paket-files/
 # JWT temp token
 .jwt/
 
+# Filesystem-based persistence directory
+.storage/
+
 # JetBrains Rider
 .idea/
 *.sln.iml

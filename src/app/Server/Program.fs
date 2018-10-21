@@ -25,7 +25,7 @@ module HttpHandlers =
     [<CLIMutable>]
     type UserAndRequestId = {
         UserId: int
-        RequestId: Guid        
+        RequestId: Guid
     }
 
     let requestTimeOff (handleCommand: Command -> Result<RequestEvent list, string>) (identity: ServerTypes.Identity) =
@@ -58,7 +58,20 @@ module HttpHandlers =
 // ---------------------------------
 
 let webApp (eventStore: IStore<UserId, RequestEvent>) =
-    let handleCommand = Logic.decide eventStore
+    let handleCommand (command: Command) =
+        let userId = command.UserId
+
+        // Decide how to handle the command
+        let result = Logic.decide eventStore command
+
+        // Save events in case of success
+        match result with
+        | Ok events -> eventStore.GetStream(userId).Append(events)
+        | _ -> ()
+
+        // Finally, return the result
+        result
+        
     choose [
         subRoute "/api"
             (choose [
@@ -91,19 +104,18 @@ let configureCors (builder: CorsPolicyBuilder) =
            .AllowAnyHeader()
            |> ignore
 
-let configureApp (app: IApplicationBuilder) =
-    let eventStore = InMemoryStore.Create<UserId, RequestEvent>()
+let configureApp (eventStore: IStore<UserId, RequestEvent>) (app: IApplicationBuilder) =
     let webApp = webApp eventStore
     let env = app.ApplicationServices.GetService<IHostingEnvironment>()
     (match env.IsDevelopment() with
-    | true  -> app.UseDeveloperExceptionPage()
+    | true -> app.UseDeveloperExceptionPage()
     | false -> app.UseGiraffeErrorHandler errorHandler)
         .UseCors(configureCors)
         .UseStaticFiles()
         .UseGiraffe(webApp)
 
 let configureServices (services: IServiceCollection) =
-    services.AddCors()    |> ignore
+    services.AddCors() |> ignore
     services.AddGiraffe() |> ignore
 
 let configureLogging (builder: ILoggingBuilder) =
@@ -113,13 +125,18 @@ let configureLogging (builder: ILoggingBuilder) =
 [<EntryPoint>]
 let main _ =
     let contentRoot = Directory.GetCurrentDirectory()
-    let webRoot     = Path.Combine(contentRoot, "WebRoot")
+
+    //let eventStore = InMemoryStore.Create<UserId, RequestEvent>()
+    let storagePath = System.IO.Path.Combine(contentRoot, "../../../.storage", "userRequests")
+    let eventStore = FileSystemStore.Create<UserId, RequestEvent>(storagePath, sprintf "%d")
+
+    let webRoot = Path.Combine(contentRoot, "WebRoot")
     WebHostBuilder()
         .UseKestrel()
         .UseContentRoot(contentRoot)
         .UseIISIntegration()
         .UseWebRoot(webRoot)
-        .Configure(Action<IApplicationBuilder> configureApp)
+        .Configure(Action<IApplicationBuilder>(configureApp eventStore))
         .ConfigureServices(configureServices)
         .ConfigureLogging(configureLogging)
         .Build()
