@@ -5,12 +5,15 @@ open EventStorage
 
 let Given events = events
 let When command events = events, command
-let Then expected message (events: RequestEvent list, command) =
-    let store = InMemoryStore.Create<UserId, RequestEvent>()
-    for event in events do
-      let stream = store.GetStream event.Request.UserId
-      stream.Append [event]
-    let result = Logic.decide store command
+let Then expected message (events: RequestEvent list, command: Command) =
+    let evolveGlobalState (userStates: Map<UserId, Logic.UserRequestsState>) (event: RequestEvent) =
+        let userState = defaultArg (Map.tryFind event.Request.UserId userStates) Map.empty
+        let newUserState = Logic.evolveUserRequests userState event
+        userStates.Add (event.Request.UserId, newUserState)
+
+    let globalState = Seq.fold evolveGlobalState Map.empty events
+    let userRequestsState = defaultArg (Map.tryFind command.UserId globalState) Map.empty
+    let result = Logic.decide userRequestsState command
     Expect.equal result expected message
 
 open System

@@ -61,24 +61,17 @@ module Logic =
             | PendingValidation _
             | Validated _ -> true
 
-    let evolve state event =
+    type UserRequestsState = Map<Guid, RequestState>
+
+    let evolveRequest state event =
         match event with
         | RequestCreated request -> PendingValidation request
         | RequestValidated request -> Validated request
 
-    let getRequestState requestEvents =
-        requestEvents |> Seq.fold evolve NotCreated
-
-    // This function builds a map (i.e. a dictionary)
-    // of request states by request id, from all events
-    // associated to a user's requests
-    let getAllRequests userRequestsEvents =
-        let folder requests (event: RequestEvent) =
-            let state = defaultArg (Map.tryFind event.Request.RequestId requests) NotCreated
-            let newState = evolve state event
-            requests.Add (event.Request.RequestId, newState)
-
-        userRequestsEvents |> Seq.fold folder Map.empty
+    let evolveUserRequests (userRequests: UserRequestsState) (event: RequestEvent) =
+        let requestState = defaultArg (Map.tryFind event.Request.RequestId userRequests) NotCreated
+        let newRequestState = evolveRequest requestState event
+        userRequests.Add (event.Request.RequestId, newRequestState)
 
     let overlapsWith request1 request2 =
         false //TODO: write a function that checks if 2 requests overlap
@@ -102,12 +95,7 @@ module Logic =
         | _ ->
             Error "Request cannot be validated"
 
-    let decide (store: IStore<UserId, RequestEvent>) (command: Command) =
-        let userId = command.UserId
-        let stream = store.GetStream userId
-        let events = stream.ReadAll()
-        let userRequests = getAllRequests events
-
+    let decide (userRequests: UserRequestsState) (command: Command) =
         match command with
         | RequestTimeOff request ->
             let activeUserRequests  =
