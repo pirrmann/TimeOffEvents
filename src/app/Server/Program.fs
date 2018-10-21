@@ -11,6 +11,7 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
 open Giraffe
+open Giraffe.HttpStatusCodeHandlers.RequestErrors
 open FSharp.Control.Tasks
 
 // ---------------------------------
@@ -21,12 +22,35 @@ module HttpHandlers =
 
     open Microsoft.AspNetCore.Http
 
-    let requestTimeOff (userRights: ServerTypes.UserRights) =
-        fun (next : HttpFunc) (ctx : HttpContext) ->
+    [<CLIMutable>]
+    type UserAndRequestId = {
+        UserId: int
+        RequestId: Guid        
+    }
+
+    let requestTimeOff (handleCommand: Command -> Result<RequestEvent list, string>) (identity: ServerTypes.Identity) =
+        fun (next: HttpFunc) (ctx: HttpContext) ->
             task {
-                let! request = ctx.BindJsonAsync<TimeOffRequest>()
-                let response = { request with UserId = 2 }
-                return! json response next ctx
+                let! timeOffRequest = ctx.BindJsonAsync<TimeOffRequest>()
+                let command = RequestTimeOff timeOffRequest
+                let result = handleCommand command
+                match result with
+                | Ok _ -> return! json timeOffRequest next ctx
+                | Error message ->
+                    return! (BAD_REQUEST message) next ctx
+            }
+
+    let validateRequest (handleCommand: Command -> Result<RequestEvent list, string>) (identity: ServerTypes.Identity) =
+        fun (next: HttpFunc) (ctx: HttpContext) ->
+            task {
+                let userAndRequestId = ctx.BindQueryString<UserAndRequestId>()
+                let command = ValidateRequest (userAndRequestId.UserId, userAndRequestId.RequestId)
+                let result = handleCommand command
+                match result with
+                | Ok [RequestValidated timeOffRequest] -> return! json timeOffRequest next ctx
+                | Ok _ -> return! Successful.NO_CONTENT next ctx
+                | Error message ->
+                    return! (BAD_REQUEST message) next ctx
             }
 
 // ---------------------------------
@@ -34,13 +58,18 @@ module HttpHandlers =
 // ---------------------------------
 
 let webApp (eventStore: IStore<UserId, RequestEvent>) =
+    let handleCommand = Logic.decide eventStore
     choose [
         subRoute "/api"
             (choose [
-                POST >=> choose [
-                    route "/users/login" >=> Auth.login
-                    route "/timeoff/request" >=> Auth.requiresJwtTokenForAPI HttpHandlers.requestTimeOff
-                ]
+                route "/users/login" >=> POST >=> Auth.login
+                subRoute "/timeoff"
+                    (Auth.requiresJwtTokenForAPI (fun identity ->
+                        choose [
+                            POST >=> route "/request" >=> HttpHandlers.requestTimeOff handleCommand identity
+                            POST >=> route "/validate-request" >=> HttpHandlers.validateRequest handleCommand identity
+                        ]
+                    ))
             ])
         setStatusCode 404 >=> text "Not Found" ]
 
@@ -48,7 +77,7 @@ let webApp (eventStore: IStore<UserId, RequestEvent>) =
 // Error handler
 // ---------------------------------
 
-let errorHandler (ex : Exception) (logger : ILogger) =
+let errorHandler (ex: Exception) (logger: ILogger) =
     logger.LogError(EventId(), ex, "An unhandled exception has occurred while executing the request.")
     clearResponse >=> setStatusCode 500 >=> text ex.Message
 
@@ -56,13 +85,13 @@ let errorHandler (ex : Exception) (logger : ILogger) =
 // Config and Main
 // ---------------------------------
 
-let configureCors (builder : CorsPolicyBuilder) =
+let configureCors (builder: CorsPolicyBuilder) =
     builder.WithOrigins("http://localhost:8080")
            .AllowAnyMethod()
            .AllowAnyHeader()
            |> ignore
 
-let configureApp (app : IApplicationBuilder) =
+let configureApp (app: IApplicationBuilder) =
     let eventStore = InMemoryStore.Create<UserId, RequestEvent>()
     let webApp = webApp eventStore
     let env = app.ApplicationServices.GetService<IHostingEnvironment>()
@@ -73,12 +102,12 @@ let configureApp (app : IApplicationBuilder) =
         .UseStaticFiles()
         .UseGiraffe(webApp)
 
-let configureServices (services : IServiceCollection) =
+let configureServices (services: IServiceCollection) =
     services.AddCors()    |> ignore
     services.AddGiraffe() |> ignore
 
-let configureLogging (builder : ILoggingBuilder) =
-    let filter (l : LogLevel) = l.Equals LogLevel.Error
+let configureLogging (builder: ILoggingBuilder) =
+    let filter (l: LogLevel) = l.Equals LogLevel.Error
     builder.AddFilter(filter).AddConsole().AddDebug() |> ignore
 
 [<EntryPoint>]

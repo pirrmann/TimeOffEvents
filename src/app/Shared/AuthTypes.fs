@@ -11,10 +11,6 @@ type Login =
       Password   : string
       PasswordId : Guid }
 
-    member this.IsValid() =
-        not ((this.UserName <> "test"  || this.Password <> "test") &&
-             (this.UserName <> "test2" || this.Password <> "test2"))
-
 type UserData =
   { UserName : string
     Token    : JWT }
