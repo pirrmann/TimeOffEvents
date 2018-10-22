@@ -24,7 +24,7 @@
                 "command": "dotnet run",
             },
             "options": {
-                "cwd": "${workspaceFolder}/src/test/TimeOffEventsTests"
+                "cwd": "${workspaceFolder}/src/test/Logic.Tests"
             },
             "problemMatcher":"$msCompile",
             "group": {
