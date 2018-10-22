@@ -61,12 +61,15 @@ let webApp (eventStore: IStore<UserId, RequestEvent>) =
     let handleCommand (command: Command) =
         let userId = command.UserId
 
+        let eventStream = eventStore.GetStream(userId)
+        let state = eventStream.ReadAll() |> Seq.fold Logic.evolveUserRequests Map.empty
+
         // Decide how to handle the command
-        let result = Logic.decide eventStore command
+        let result = Logic.decide state command
 
         // Save events in case of success
         match result with
-        | Ok events -> eventStore.GetStream(userId).Append(events)
+        | Ok events -> eventStream.Append(events)
         | _ -> ()
 
         // Finally, return the result
