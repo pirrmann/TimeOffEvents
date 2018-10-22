@@ -4,7 +4,7 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "taskName": "Build",
+            "label": "Build",
             "type": "shell",
             "command": "dotnet build",
             "windows": {
@@ -24,7 +24,7 @@
                 "command": "dotnet run",
             },
             "options": {
-                "cwd": "${workspaceFolder}/TimeOffEvents"
+                "cwd": "${workspaceFolder}/src/test/TimeOffEventsTests"
             },
             "problemMatcher":"$msCompile",
             "group": {
