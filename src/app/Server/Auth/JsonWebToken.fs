@@ -1,4 +1,4 @@
-module ServerCode.JsonWebToken
+module ServerCode.Auth.JsonWebToken
 
 //  Learn about JWT https://jwt.io/introduction/
 //  This module uses the JOSE-JWT library https://github.com/dvsekhvalnov/jose-jwt
@@ -34,11 +34,3 @@ let encode token =
 let decode<'a> (jwt:string) : 'a =
     decodeString jwt
     |> JsonConvert.DeserializeObject<'a>
-
-/// Returns true if the JSON Web Token is successfully decoded and the signature is verified.
-let isValid (jwt:string) : ServerTypes.Identity option =
-    try
-        let token = decode jwt
-        Some token
-    with
-    | _ -> None

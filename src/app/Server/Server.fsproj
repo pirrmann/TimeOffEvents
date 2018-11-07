@@ -22,9 +22,8 @@
     <PackageReference Include="Giraffe" Version="3.0.*" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ServerTypes.fs" />
-    <Compile Include="JsonWebToken.fs" />
-    <Compile Include="Auth.fs" />
+    <Compile Include="Auth\JsonWebToken.fs" />
+    <Compile Include="Auth\Auth.fs" />
     <Compile Include="Program.fs" />
   </ItemGroup>
   <ItemGroup>

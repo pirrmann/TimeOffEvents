@@ -1,5 +1,6 @@
 ﻿namespace TimeOff.AuthTypes
 
+open TimeOff
 open System
 
 // Json web token type.
@@ -13,4 +14,5 @@ type Login =
 
 type UserData =
   { UserName : string
+    User     : User
     Token    : JWT }
