@@ -3,8 +3,10 @@
 open System
 
 // First, we define our domain
+type UserId = int
+
 type User =
-    | Employee of int
+    | Employee of UserId
     | Manager
 
 type HalfDay = | AM | PM
@@ -14,8 +16,6 @@ type Boundary = {
     Date: DateTime
     HalfDay: HalfDay
 }
-
-type UserId = int
 
 [<CLIMutable>]
 type TimeOffRequest = {

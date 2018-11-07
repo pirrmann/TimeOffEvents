@@ -1,7 +1,6 @@
 ﻿namespace TimeOff
 
 open System
-open EventStorage
 
 // Then our commands
 type Command =
@@ -74,18 +73,26 @@ module Logic =
         | _ ->
             Error "Request cannot be validated"
 
-    let decide (userRequests: UserRequestsState) (command: Command) =
-        match command with
-        | RequestTimeOff request ->
-            let activeUserRequests  =
-                userRequests
-                |> Map.toSeq
-                |> Seq.map (fun (_, state) -> state)
-                |> Seq.where (fun state -> state.IsActive)
-                |> Seq.map (fun state -> state.Request)
+    let decide (userRequests: UserRequestsState) (user: User) (command: Command) =
+        let relatedUserId = command.UserId
+        match user with
+        | Employee userId when userId <> relatedUserId ->
+            Error "Unauthorized"
+        | _ ->
+            match command with
+            | RequestTimeOff request ->
+                let activeUserRequests =
+                    userRequests
+                    |> Map.toSeq
+                    |> Seq.map (fun (_, state) -> state)
+                    |> Seq.where (fun state -> state.IsActive)
+                    |> Seq.map (fun state -> state.Request)
 
-            createRequest activeUserRequests  request
+                createRequest activeUserRequests request
 
-        | ValidateRequest (_, requestId) ->
-            let requestState = defaultArg (userRequests.TryFind requestId) NotCreated
-            validateRequest requestState
+            | ValidateRequest (_, requestId) ->
+                if user <> Manager then
+                    Error "Unauthorized"
+                else
+                    let requestState = defaultArg (userRequests.TryFind requestId) NotCreated
+                    validateRequest requestState

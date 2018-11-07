@@ -24,28 +24,36 @@ module HttpHandlers =
 
     [<CLIMutable>]
     type UserAndRequestId = {
-        UserId: int
+        UserId: UserId
         RequestId: Guid
     }
 
-    let requestTimeOff (handleCommand: Command -> Result<RequestEvent list, string>) (identity: ServerTypes.Identity) =
+    let getUserFromIdentity (identity: ServerTypes.Identity) : User =
+        if identity.Roles |> Seq.contains "manager" then
+            Manager
+        else
+            Employee identity.UserId
+
+    let requestTimeOff (handleCommand: User -> Command -> Result<RequestEvent list, string>) (identity: ServerTypes.Identity) =
         fun (next: HttpFunc) (ctx: HttpContext) ->
             task {
                 let! timeOffRequest = ctx.BindJsonAsync<TimeOffRequest>()
+                let user = getUserFromIdentity identity
                 let command = RequestTimeOff timeOffRequest
-                let result = handleCommand command
+                let result = handleCommand user command
                 match result with
                 | Ok _ -> return! json timeOffRequest next ctx
                 | Error message ->
                     return! (BAD_REQUEST message) next ctx
             }
 
-    let validateRequest (handleCommand: Command -> Result<RequestEvent list, string>) (identity: ServerTypes.Identity) =
+    let validateRequest (handleCommand: User -> Command -> Result<RequestEvent list, string>) (identity: ServerTypes.Identity) =
         fun (next: HttpFunc) (ctx: HttpContext) ->
             task {
                 let userAndRequestId = ctx.BindQueryString<UserAndRequestId>()
+                let user = getUserFromIdentity identity
                 let command = ValidateRequest (userAndRequestId.UserId, userAndRequestId.RequestId)
-                let result = handleCommand command
+                let result = handleCommand user command
                 match result with
                 | Ok [RequestValidated timeOffRequest] -> return! json timeOffRequest next ctx
                 | Ok _ -> return! Successful.NO_CONTENT next ctx
@@ -58,14 +66,14 @@ module HttpHandlers =
 // ---------------------------------
 
 let webApp (eventStore: IStore<UserId, RequestEvent>) =
-    let handleCommand (command: Command) =
+    let handleCommand (user: User) (command: Command) =
         let userId = command.UserId
 
         let eventStream = eventStore.GetStream(userId)
         let state = eventStream.ReadAll() |> Seq.fold Logic.evolveUserRequests Map.empty
 
         // Decide how to handle the command
-        let result = Logic.decide state command
+        let result = Logic.decide state user command
 
         // Save events in case of success
         match result with
