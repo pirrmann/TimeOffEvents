@@ -15,6 +15,10 @@ let root model dispatch =
       match model.TransientPageModel with
       | LoginModel loginModel -> [ Login.View.root loginModel (LoginMsg >> dispatch) ]
       | _ -> []
+    | Page.Balance _ ->
+      match model.TransientPageModel with
+      | BalanceModel balanceModel -> [ Balance.View.root balanceModel (BalanceMsg >> dispatch) ]
+      | _ -> []
     | Page.About -> [ About.View.root ]
 
   div

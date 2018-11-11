@@ -8,6 +8,7 @@ type Page =
     | Home
     | Login
     | About
+    | Balance of userName:string option
 
 module Pages =
     let toPath =
@@ -15,6 +16,8 @@ module Pages =
         | Page.Home -> "#home"
         | Page.About -> "#about"
         | Page.Login -> "#login"
+        | Page.Balance None -> "#balance"
+        | Page.Balance (Some userName) -> sprintf "#balance/%s" userName
 
     /// The URL is turned into a Result.
     let pageParser : Parser<Page -> Page,_> =
@@ -22,6 +25,8 @@ module Pages =
             map Page.Home (s "home")
             map Page.Login (s "login")
             map Page.About (s "about")
+            map (Page.Balance << Some) (s "balance" </> str)
+            map (Page.Balance None) (s "balance")
         ]
 
     let urlParser location =

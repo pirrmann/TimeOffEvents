@@ -24,3 +24,13 @@ type TimeOffRequest = {
     Start: Boundary
     End: Boundary
 }
+
+[<CLIMutable>]
+type UserVacationBalance = {
+  UserName : string
+  BalanceYear: int
+  CarriedOver: float
+  PortionAccruedToDate: float
+  TakenToDate: float
+  CurrentBalance: float
+}

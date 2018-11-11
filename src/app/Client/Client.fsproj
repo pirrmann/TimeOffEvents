@@ -23,6 +23,9 @@
     <Compile Include="Login/Types.fs" />
     <Compile Include="Login/State.fs" />
     <Compile Include="Login/View.fs" />
+    <Compile Include="Balance/Types.fs" />
+    <Compile Include="Balance/State.fs" />
+    <Compile Include="Balance/View.fs" />
     <Compile Include="About/View.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="State.fs" />

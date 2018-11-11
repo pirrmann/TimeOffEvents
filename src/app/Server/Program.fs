@@ -55,6 +55,20 @@ module HttpHandlers =
                     return! (BAD_REQUEST message) next ctx
             }
 
+    let getUserBalance (user: User) =    
+        fun (next: HttpFunc) (ctx: HttpContext) ->
+            task {
+                let balance : UserVacationBalance = {
+                  UserName = "jdoe"
+                  BalanceYear = 2018
+                  CarriedOver = 0.0
+                  PortionAccruedToDate = 10.0
+                  TakenToDate = 0.0
+                  CurrentBalance = 10.
+                }
+                return! json balance next ctx
+            }
+
 // ---------------------------------
 // Web app
 // ---------------------------------
@@ -84,8 +98,9 @@ let webApp (eventStore: IStore<UserId, RequestEvent>) =
                 subRoute "/timeoff"
                     (Auth.Handlers.requiresJwtTokenForAPI (fun user ->
                         choose [
-                            POST >=> route "/request/" >=> HttpHandlers.requestTimeOff (handleCommand user)
-                            POST >=> route "/validate-request/" >=> HttpHandlers.validateRequest (handleCommand user)
+                            route "/request/" >=> POST >=> HttpHandlers.requestTimeOff (handleCommand user)
+                            route "/validate-request/" >=> POST >=> HttpHandlers.validateRequest (handleCommand user)
+                            route "/user-balance" >=> GET >=> HttpHandlers.getUserBalance user
                         ]
                     ))
             ])
