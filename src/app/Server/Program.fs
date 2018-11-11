@@ -11,8 +11,10 @@ open Microsoft.AspNetCore.Hosting
 open Microsoft.Extensions.Logging
 open Microsoft.Extensions.DependencyInjection
 open Giraffe
+open Giraffe.Serialization.Json
 open Giraffe.HttpStatusCodeHandlers.RequestErrors
 open FSharp.Control.Tasks
+open Thoth.Json.Giraffe
 
 // ---------------------------------
 // Handlers
@@ -78,16 +80,16 @@ let webApp (eventStore: IStore<UserId, RequestEvent>) =
     choose [
         subRoute "/api"
             (choose [
-                route "/users/login" >=> POST >=> Auth.Handlers.login
+                route "/users/login/" >=> POST >=> Auth.Handlers.login
                 subRoute "/timeoff"
                     (Auth.Handlers.requiresJwtTokenForAPI (fun user ->
                         choose [
-                            POST >=> route "/request" >=> HttpHandlers.requestTimeOff (handleCommand user)
-                            POST >=> route "/validate-request" >=> HttpHandlers.validateRequest (handleCommand user)
+                            POST >=> route "/request/" >=> HttpHandlers.requestTimeOff (handleCommand user)
+                            POST >=> route "/validate-request/" >=> HttpHandlers.validateRequest (handleCommand user)
                         ]
                     ))
             ])
-        setStatusCode 404 >=> text "Not Found" ]
+        RequestErrors.NOT_FOUND "Not found" ]
 
 // ---------------------------------
 // Error handler
@@ -120,6 +122,7 @@ let configureApp (eventStore: IStore<UserId, RequestEvent>) (app: IApplicationBu
 let configureServices (services: IServiceCollection) =
     services.AddCors() |> ignore
     services.AddGiraffe() |> ignore
+    services.AddSingleton<IJsonSerializer>(ThothSerializer()) |> ignore
 
 let configureLogging (builder: ILoggingBuilder) =
     let filter (l: LogLevel) = l.Equals LogLevel.Error

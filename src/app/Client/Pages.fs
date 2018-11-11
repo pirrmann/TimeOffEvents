@@ -6,16 +6,22 @@ open Elmish.Browser.UrlParser
 [<RequireQualifiedAccess>]
 type Page =
     | Home
+    | Login
+    | About
 
 module Pages =
     let toPath =
         function
         | Page.Home -> "#home"
+        | Page.About -> "#about"
+        | Page.Login -> "#login"
 
     /// The URL is turned into a Result.
     let pageParser : Parser<Page -> Page,_> =
         oneOf [
             map Page.Home (s "home")
+            map Page.Login (s "login")
+            map Page.About (s "about")
         ]
 
     let urlParser location =

@@ -15,10 +15,11 @@ let menuItem label page currentPage =
             Href (Pages.toPath page) ]
           [ str label ] ]
 
-let view (currentPage: Page) =
-
+let view (model: NavigationData) =
+  let currentPage = model.CurrentPage
   Menu.menu [ ]
     [
       Menu.label [ ] [ str "General" ]
       Menu.list [ ]
-        [ yield menuItem "Home" Page.Home currentPage ] ]
+        [ yield menuItem "Home" Page.Home currentPage
+          yield menuItem "About" Page.About currentPage ] ]

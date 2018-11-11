@@ -11,10 +11,15 @@ let root model dispatch =
   let pageHtml =
     function
     | Page.Home -> [ Home.View.root model.Home (HomeMsg >> dispatch) ]
+    | Page.Login ->
+      match model.TransientPageModel with
+      | LoginModel loginModel -> [ Login.View.root loginModel (LoginMsg >> dispatch) ]
+      | _ -> []
+    | Page.About -> [ About.View.root ]
 
   div
     []
-    [ Navbar.View.view model.CurrentPage
+    [ Navbar.View.view model.Navigation (GlobalMsg >> dispatch)
       div
         [ ClassName "section" ]
         [ div
@@ -23,7 +28,9 @@ let root model dispatch =
                 [ ClassName "columns" ]
                 [ div
                     [ ClassName "column is-3" ]
-                    [ Menu.View.view model.CurrentPage ]
+                    [ Menu.View.view model.Navigation ]
                   div
                     [ ClassName "column" ]
-                    (pageHtml model.CurrentPage) ] ] ] ]
+                    (pageHtml model.Navigation.CurrentPage) ] ] ] ]
+
+
