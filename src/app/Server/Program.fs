@@ -1,7 +1,7 @@
 module ServerCode.App
 
 open TimeOff
-open EventStorage
+open Storage.Events
 
 open System
 open System.IO
