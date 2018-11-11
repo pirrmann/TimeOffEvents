@@ -11,7 +11,8 @@ let root model dispatch =
   match model.Balance with
   | Some balance ->
     div []
-      [
+      [ Heading.h3 [ ]
+            [ str "Balance for employee "; str balance.UserName ]
         Box.box' []
           [
             Table.table [ Table.IsNarrow ]

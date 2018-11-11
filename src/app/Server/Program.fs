@@ -55,11 +55,11 @@ module HttpHandlers =
                     return! (BAD_REQUEST message) next ctx
             }
 
-    let getUserBalance (user: User) =    
+    let getUserBalance (authentifiedUser: User) (userName: string) =
         fun (next: HttpFunc) (ctx: HttpContext) ->
             task {
                 let balance : UserVacationBalance = {
-                  UserName = "jdoe"
+                  UserName = userName
                   BalanceYear = 2018
                   CarriedOver = 0.0
                   PortionAccruedToDate = 10.0
@@ -98,9 +98,12 @@ let webApp (eventStore: IStore<UserId, RequestEvent>) =
                 subRoute "/timeoff"
                     (Auth.Handlers.requiresJwtTokenForAPI (fun user ->
                         choose [
-                            route "/request/" >=> POST >=> HttpHandlers.requestTimeOff (handleCommand user)
-                            route "/validate-request/" >=> POST >=> HttpHandlers.validateRequest (handleCommand user)
-                            route "/user-balance" >=> GET >=> HttpHandlers.getUserBalance user
+                            POST >=>
+                                (choose [                        
+                                    routex "/request/?" >=> HttpHandlers.requestTimeOff (handleCommand user)
+                                    routex "/validate-request/?" >=> HttpHandlers.validateRequest (handleCommand user)
+                                ])
+                            GET >=> routef "/user-balance/%s" (HttpHandlers.getUserBalance user)
                         ]
                     ))
             ])
@@ -149,7 +152,7 @@ let main _ =
 
     //let eventStore = InMemoryStore.Create<UserId, RequestEvent>()
     let storagePath = System.IO.Path.Combine(contentRoot, "../../../.storage", "userRequests")
-    let eventStore = FileSystemStore.Create<UserId, RequestEvent>(storagePath, sprintf "%d")
+    let eventStore = FileSystemStore.Create<UserId, RequestEvent>(storagePath, id)
 
     let webRoot = Path.Combine(contentRoot, "WebRoot")
     WebHostBuilder()

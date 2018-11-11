@@ -17,7 +17,7 @@ let getUserBalance token userName =
             [ Fetch.requestHeaders [
                 HttpRequestHeaders.Authorization ("Bearer " + token) ]]
 
-        let! res = Fetch.fetch url props
+        let! res = Fetch.fetch (url + userName) props
         let! txt = res.text()
         return Decode.Auto.unsafeFromString<UserVacationBalance> txt
     }

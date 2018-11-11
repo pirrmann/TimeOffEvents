@@ -17,12 +17,21 @@ let menuItem label page currentPage =
 
 let view (model: NavigationData) =
   let currentPage = model.CurrentPage
-  let loggedIn = model.User.IsSome
+  let isLoggedIn, isManager =
+    match model.User with
+    | Some userData ->
+        match userData.User with
+        | Manager -> true, true
+        | _ -> true, false
+    | _ -> false, false
+
   Menu.menu [ ]
     [
       Menu.label [ ] [ str "General" ]
       Menu.list [ ]
         [ yield menuItem "Home" Page.Home currentPage
-          if loggedIn then
+          if isManager then
+            yield menuItem "Employees" Page.Employees currentPage
+          elif isLoggedIn then
             yield menuItem "Balance" (Page.Balance None) currentPage
           yield menuItem "About" Page.About currentPage ] ]

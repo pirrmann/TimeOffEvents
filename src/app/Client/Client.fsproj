@@ -26,6 +26,7 @@
     <Compile Include="Balance/Types.fs" />
     <Compile Include="Balance/State.fs" />
     <Compile Include="Balance/View.fs" />
+    <Compile Include="Employees/View.fs" />
     <Compile Include="About/View.fs" />
     <Compile Include="Types.fs" />
     <Compile Include="State.fs" />
