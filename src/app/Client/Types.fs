@@ -6,5 +6,6 @@ type AppMsg =
 
 /// The composed model for the application, which is a single page state plus login information
 type Model = {
+        CurrentPage: Page
         Home: Home.Types.Model
     }

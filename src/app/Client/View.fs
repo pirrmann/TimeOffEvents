@@ -8,13 +8,22 @@ open Client.Types
 
 /// Constructs the view for a page given the model and dispatcher.
 let root model dispatch =
+  let pageHtml =
+    function
+    | Page.Home -> [ Home.View.root model.Home (HomeMsg >> dispatch) ]
+
   div
     []
-    [ Heading.h1 [] [str "Demo app"]
+    [ Navbar.View.view model.CurrentPage
       div
         [ ClassName "section" ]
         [ div
             [ ClassName "container" ]
+            [ div
+                [ ClassName "columns" ]
                 [ div
+                    [ ClassName "column is-3" ]
+                    [ Menu.View.view model.CurrentPage ]
+                  div
                     [ ClassName "column" ]
-                    [ Home.View.root model.Home (HomeMsg >> dispatch) ] ] ] ]
+                    (pageHtml model.CurrentPage) ] ] ] ]

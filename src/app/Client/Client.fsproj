@@ -8,6 +8,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Pages.fs" />
+    <Compile Include="Menu/View.fs" />
+    <Compile Include="Navbar/View.fs" />
     <Compile Include="Counter/Types.fs" />
     <Compile Include="Counter/State.fs" />
     <Compile Include="Counter/View.fs" />

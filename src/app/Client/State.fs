@@ -6,6 +6,7 @@ open Types
 let init () =
   let (home, homeCmd) = Home.State.init()
   let model = {
+    CurrentPage = Page.Home
     Home = home }
   model, Cmd.batch [ Cmd.map HomeMsg homeCmd ]
 
