@@ -18,6 +18,5 @@ let root model dispatch =
         [ Column.column [ ]
             [ str (sprintf "Counter value: %i" model.Counter) ]
           simpleButton "+1" Increment dispatch
-          simpleButton "-1" Decrement dispatch
-          simpleButton "Reset" Reset dispatch ]
+          simpleButton "-1" Decrement dispatch ]
     ]

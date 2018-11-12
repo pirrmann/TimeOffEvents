@@ -11,5 +11,3 @@ let update msg model =
       { model with Counter = model.Counter  + 1 }, []
   | Decrement ->
       { model with Counter = model.Counter  - 1 }, []
-  | Reset ->
-      { model with Counter = 0 }, []

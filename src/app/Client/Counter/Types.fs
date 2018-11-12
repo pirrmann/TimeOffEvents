@@ -7,4 +7,3 @@ type Model = {
 type Msg =
   | Increment
   | Decrement
-  | Reset

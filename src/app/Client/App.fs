@@ -7,7 +7,7 @@ open Elmish.HMR
 open Elmish.Debug
 
 // App
-Program.mkProgram State.init State.update View.root
+Program.mkProgram Counter.State.init Counter.State.update Counter.View.root
 #if DEBUG
 |> Program.withConsoleTrace
 |> Program.withHMR
