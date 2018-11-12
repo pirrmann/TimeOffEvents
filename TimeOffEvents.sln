@@ -10,6 +10,8 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Logic", "src\app\Logic\Logi
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Server", "src\app\Server\Server.fsproj", "{FEF3C9AD-A3B8-4594-BB94-1A4D27A0ACC1}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Client", "src\app\Client\Client.fsproj", "{FE829474-5BFA-4641-BA15-15E8CDC5BEAD}"
+EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Logic.Tests", "src\test\Logic.Tests\Logic.Tests.fsproj", "{FD40B736-32E5-4835-BB96-EF493D7F9D62}"
 EndProject
 Global
@@ -34,6 +36,10 @@ Global
 		{FEF3C9AD-A3B8-4594-BB94-1A4D27A0ACC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FEF3C9AD-A3B8-4594-BB94-1A4D27A0ACC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FEF3C9AD-A3B8-4594-BB94-1A4D27A0ACC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FE829474-5BFA-4641-BA15-15E8CDC5BEAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FE829474-5BFA-4641-BA15-15E8CDC5BEAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FE829474-5BFA-4641-BA15-15E8CDC5BEAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FE829474-5BFA-4641-BA15-15E8CDC5BEAD}.Release|Any CPU.Build.0 = Release|Any CPU
 		{FD40B736-32E5-4835-BB96-EF493D7F9D62}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{FD40B736-32E5-4835-BB96-EF493D7F9D62}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD40B736-32E5-4835-BB96-EF493D7F9D62}.Release|Any CPU.ActiveCfg = Release|Any CPU
