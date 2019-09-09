@@ -5,7 +5,8 @@ open System
 // Then our commands
 type Command =
     | RequestTimeOff of TimeOffRequest
-    | ValidateRequest of UserId * Guid with
+    | ValidateRequest of UserId * Guid
+    with
     member this.UserId =
         match this with
         | RequestTimeOff request -> request.UserId
@@ -14,7 +15,8 @@ type Command =
 // And our events
 type RequestEvent =
     | RequestCreated of TimeOffRequest
-    | RequestValidated of TimeOffRequest with
+    | RequestValidated of TimeOffRequest
+    with
     member this.Request =
         match this with
         | RequestCreated request -> request

@@ -3,7 +3,7 @@
 open System
 
 // First, we define our domain
-type UserId = int
+type UserId = string
 
 type User =
     | Employee of UserId

@@ -1,13 +1,12 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="EventStorage.fs" />
-    <Compile Include="InMemory.fs" />
     <Compile Include="Serialization.fs" />
-    <Compile Include="FileSystem.fs" />
+    <Compile Include="Events/EventStorage.fs" />
+    <Compile Include="Events/InMemoryEventStorage.fs" />
+    <Compile Include="Events/FileSystemEventStorage.fs" />
   </ItemGroup>
   <Import Project="..\..\..\.paket\Paket.Restore.targets" />
 </Project>
